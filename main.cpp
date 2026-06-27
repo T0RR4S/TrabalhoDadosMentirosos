@@ -392,10 +392,10 @@ void exibirTelaDerrota(const string &nomeExibido)
     system("cls");
     imprimirDerrota(1); // arte Braille com efeito de aparecimento progressivo
     cout << "\n";
-    imprimirSeparador("*");
+    imprimirSeparador("⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ", LARGURA / 12);
     // nome do eliminado entre dois separadores: sem linha vazia antes
-    imprimirCentralizado(nomeExibido + " foi ELIMINADO!", VERMELHO_B);
-    imprimirSeparador("*");
+    imprimirCentralizado(nomeExibido + ", VOCÊ MORREU!", VERMELHO_B);
+    imprimirSeparador("⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ", LARGURA / 12);
     this_thread::sleep_for(chrono::milliseconds(3000)); // pausa para leitura da tela
     system("cls");
 }
@@ -908,18 +908,18 @@ int main()
 
     // Tela de fim de jogo com o vencedor
     imprimirTitulo();
-    imprimirSeparador("*");
+    imprimirSeparador("⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ", LARGURA / 12);
     // "FIM DE JOGO" entre dois separadores: sem linha vazia antes
-    imprimirCentralizado("FIM DE JOGO!");
+    imprimirCentralizado("PARABÉNS");
     for (const auto &j : jogadores)
     {
         if (j.ativo)
         {
-            imprimirCentralizado("Vencedor: " + j.nomeExibido);
+            imprimirCentralizado(j.nomeExibido + ", VOCÊ SOBREVIVEU!");
             break;
         }
     }
-    imprimirSeparador("*");
+    imprimirSeparador("⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ", LARGURA / 12);
 
     return 0;
 }
