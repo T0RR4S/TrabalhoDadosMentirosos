@@ -18,6 +18,7 @@
 #include <iomanip>
 #include <fstream>
 #include "layout.h"
+#include "layout2.h"
 #include "dados.h"
 #include "cores.h"
 #include <vector>
@@ -41,11 +42,11 @@ const int LARGURA = 120; ///< Largura total do terminal em caracteres.
  */
 struct Jogador
 {
-    int id;              ///< Identificador numerico do jogador (1-based).
-    string nome;         ///< Nome cru digitado pelo jogador.
-    string nomeExibido;  ///< Nome formatado com cor ANSI e ID para exibicao.
-    vector<int> dados;   ///< Valores atuais dos dados do jogador (1-6 cada).
-    bool ativo;          ///< false quando o jogador e eliminado (sem dados).
+    int id;             ///< Identificador numerico do jogador (1-based).
+    string nome;        ///< Nome cru digitado pelo jogador.
+    string nomeExibido; ///< Nome formatado com cor ANSI e ID para exibicao.
+    vector<int> dados;  ///< Valores atuais dos dados do jogador (1-6 cada).
+    bool ativo;         ///< false quando o jogador e eliminado (sem dados).
 };
 
 // ========================
@@ -67,9 +68,9 @@ int tamanhoVisivel(const string &texto)
     bool emEscape = false;
     for (char c : texto)
     {
-        if (c == '\033') { emEscape = true; continue; }  // inicio de sequencia ESC
-        if (emEscape)    { if (c == 'm') emEscape = false; continue; } // fim em 'm'
-        if ((unsigned char)c >= 0x80 && (unsigned char)c < 0xC0) continue; // byte de continuacao UTF-8
+        if (c == '\033') { emEscape = true; continue; }
+        if (emEscape) { if (c == 'm') emEscape = false; continue; }
+        if ((unsigned char)c >= 0x80 && (unsigned char)c < 0xC0) continue;
         tam++;
     }
     return tam;
@@ -82,50 +83,53 @@ int tamanhoVisivel(const string &texto)
 /**
  * @brief Imprime texto centralizado na largura LARGURA, com efeito de digitacao.
  *
- * Calcula o padding com base na largura visivel (ignora escapes ANSI/UTF-8).
- * Aplica uma cor opcional antes do texto e reseta apos.
+ * Usado apenas na tela inicial (layout). Para o restante do jogo,
+ * usar imprimirCentralizado (instantaneo).
  *
  * @param texto        Texto a ser exibido.
  * @param ms_por_letra Delay em milissegundos entre cada caractere (0 = instantaneo).
  * @param cor          Sequencia ANSI de cor a aplicar (padrao: sem cor).
  */
-void imprimirCentralizado(const string &texto, int ms_por_letra = 100, const string &cor = "")
+void imprimirCentralizadoDevagar(const string &texto, int ms_por_letra = 100, const string &cor = "")
 {
     int espacos = (LARGURA - tamanhoVisivel(texto)) / 2;
-    if (espacos < 0)
-        espacos = 0;
+    if (espacos < 0) espacos = 0;
     cout << string(espacos, ' ') << cor;
     for (char c : texto)
     {
         if (c != ' ')
-            this_thread::sleep_for(chrono::milliseconds(ms_por_letra)); // pausa por letra (exceto espacos)
+            this_thread::sleep_for(chrono::milliseconds(ms_por_letra));
         cout << c << flush;
     }
     cout << RESET << "\n";
 }
 
 /**
- * @brief Atalho para imprimirCentralizado com delay padrao de 100 ms/letra.
- * @param texto        Texto a ser exibido.
- * @param ms_por_letra Delay em milissegundos entre cada caractere.
+ * @brief Imprime texto centralizado na largura LARGURA, instantaneamente.
+ *
+ * Calcula o padding com base na largura visivel (ignora escapes ANSI/UTF-8).
+ * Aplica uma cor opcional antes do texto e reseta apos.
+ *
+ * @param texto Texto a ser exibido.
+ * @param cor   Sequencia ANSI de cor a aplicar (padrao: sem cor).
  */
-void imprimirCentralizadoDevagar(const string &texto, int ms_por_letra = 100)
+void imprimirCentralizado(const string &texto, const string &cor = "")
 {
-    imprimirCentralizado(texto, ms_por_letra);
+    int espacos = (LARGURA - tamanhoVisivel(texto)) / 2;
+    if (espacos < 0) espacos = 0;
+    cout << string(espacos, ' ') << cor << texto << RESET << "\n";
 }
 
 /**
- * @brief Imprime uma linha separadora de LARGURA colunas.
+ * @brief Imprime uma linha separadora de LARGURA colunas, instantaneamente.
  *
  * Repete @p simbolo (que pode ser UTF-8 multibyte como "⚀") @p colunas vezes.
- * Aguarda 500 ms antes de imprimir para dar ritmo visual.
  *
  * @param simbolo String (possivelmente UTF-8) usada como caractere de separacao.
  * @param colunas Numero de repeticoes do simbolo.
  */
 void imprimirSeparador(const string &simbolo = "=", int colunas = LARGURA)
 {
-    this_thread::sleep_for(chrono::milliseconds(500));
     string linha = "";
     for (int i = 0; i < colunas; i++)
         linha += simbolo;
@@ -133,25 +137,43 @@ void imprimirSeparador(const string &simbolo = "=", int colunas = LARGURA)
 }
 
 /**
- * @brief Imprime um bloco de linhas alinhado a esquerda, centrado como bloco.
+ * @brief Imprime um bloco de linhas pre-formatadas de uma vez e pausa.
+ *
+ * Usado para exibir blocos tematicos (dados restantes, resultado, etc.)
+ * de forma instantanea, seguidos de uma pausa para leitura.
+ *
+ * @param linhas    Vetor de strings ja formatadas (com padding/cor) para impressao.
+ * @param pausa_ms  Tempo de pausa em milissegundos apos imprimir o bloco.
+ */
+void imprimirBloco(const vector<string> &linhas, int pausa_ms = 2000)
+{
+    for (const auto &l : linhas)
+        cout << l << "\n";
+    this_thread::sleep_for(chrono::milliseconds(pausa_ms));
+}
+
+/**
+ * @brief Imprime um bloco de linhas alinhado a esquerda, centrado como bloco, e pausa.
  *
  * Calcula a largura da linha mais longa do bloco e usa esse valor
  * para determinar o padding esquerdo unico para todas as linhas.
  *
- * @param linhas Vetor de strings a serem impressas como bloco centrado.
+ * @param linhas   Vetor de strings a serem impressas como bloco centrado.
+ * @param pausa_ms Tempo de pausa em milissegundos apos imprimir o bloco (0 = sem pausa).
  */
-void imprimirBlocoCentralizado(const vector<string> &linhas)
+void imprimirBlocoCentralizado(const vector<string> &linhas, int pausa_ms = 0)
 {
     int larguraBloco = 0;
     for (const auto &l : linhas)
         if (tamanhoVisivel(l) > larguraBloco)
             larguraBloco = tamanhoVisivel(l);
     int espacos = (LARGURA - larguraBloco) / 2;
-    if (espacos < 0)
-        espacos = 0;
+    if (espacos < 0) espacos = 0;
     string pad = string(espacos, ' ');
     for (const auto &l : linhas)
         cout << pad << l << "\n";
+    if (pausa_ms > 0)
+        this_thread::sleep_for(chrono::milliseconds(pausa_ms));
 }
 
 // ========================
@@ -173,50 +195,147 @@ string formatarId(int n)
 // ========================
 
 /**
- * @brief Bloqueia a execucao ate o usuario pressionar qualquer tecla.
+ * @brief Exibe dois prompts piscantes lado a lado e aguarda Enter ou Backspace.
  *
- * Exibe um prompt "[enter]" piscante centralizado enquanto aguarda.
- * Usa _kbhit() para nao bloquear o loop de animacao.
+ * Imprime @p promptEsq centralizado a esquerda do centro e @p promptDir
+ * a direita, ambos piscando. Retorna quando uma das duas teclas for pressionada.
+ * Outras teclas sao ignoradas.
+ *
+ * @param promptEsq  Linhas do prompt da esquerda (Backspace).
+ * @param promptDir  Linhas do prompt da direita (Enter). Pode ser vazio.
+ * @param corEsq     Cor ANSI do prompt esquerdo.
+ * @param corDir     Cor ANSI do prompt direito.
+ * @param teclaEsq   Codigo ASCII da tecla esquerda (8 = Backspace).
+ * @param teclaDir   Codigo ASCII da tecla direita (13 = Enter). -1 = ignorar.
+ * @return true se pressionou teclaDir, false se pressionou teclaEsq.
  */
-void aguardarTecla()
+bool aguardarDuasTeclas(
+    const vector<string> &promptEsq, const vector<string> &promptDir,
+    const string &corEsq, const string &corDir,
+    int teclaEsq, int teclaDir)
 {
-    cout << "\n";
+    // Altura do bloco = maior dos dois prompts
+    int nE = (int)promptEsq.size();
+    int nD = (int)promptDir.size();
+    int nLinhas = max(nE, nD);
+
+    // Largura maxima de cada lado
+    int largEsq = 0, largDir = 0;
+    for (const auto &l : promptEsq) largEsq = max(largEsq, (int)l.size());
+    for (const auto &l : promptDir) largDir = max(largDir, (int)l.size());
+
+    int gap = 29; // espacos entre os dois prompts
+    int largTotal = largEsq + gap + largDir;
+    int padEsq = (LARGURA - largTotal) / 2; // padding esquerdo do bloco inteiro
+    if (padEsq < 0) padEsq = 0;
+
+    auto imprimir = [&](bool visivel)
+    {
+        for (int i = 0; i < nLinhas; i++)
+        {
+            string linhaEsq = (i < nE) ? promptEsq[i] : string(largEsq, ' ');
+            string linhaDir = (i < nD) ? promptDir[i] : string(largDir, ' ');
+
+            // padding direito para alinhar
+            linhaEsq += string(largEsq - (int)linhaEsq.size(), ' ');
+            linhaDir += string(largDir - (int)linhaDir.size(), ' ');
+
+            cout << string(padEsq, ' ');
+            if (visivel) cout << corEsq;
+            cout << linhaEsq << RESET;
+            cout << string(gap, ' ');
+            if (visivel && !promptDir.empty()) cout << corDir;
+            cout << linhaDir << RESET << "\n";
+        }
+    };
+
+    // Imprime inicial
+    imprimir(true);
+    // Sobe para comecar o loop de piscar
+    for (int i = 0; i < nLinhas; i++) cout << "\033[A";
+
     bool visivel = true;
     while (true)
     {
         if (_kbhit())
         {
-            _getch(); // consome a tecla pressionada sem exibir
-            break;
+            int tecla = _getch();
+            if (tecla == teclaDir && teclaDir != -1)
+            {
+                for (int i = 0; i < nLinhas; i++) cout << "\033[2K\n";
+                system("cls");
+                return true;
+            }
+            if (tecla == teclaEsq)
+            {
+                for (int i = 0; i < nLinhas; i++) cout << "\033[2K\n";
+                system("cls");
+                return false;
+            }
+            if (tecla == 0 || tecla == 224) _getch(); // descarta segundo byte de tecla especial
         }
 
-        // Alterna entre exibir e apagar o prompt para criar efeito de piscar
-        if (visivel)
-        {
-            imprimirCentralizado("[        ]", 0, VERMELHO_B);
-            imprimirCentralizado("[  enter ]", 0, VERMELHO_B);
-            imprimirCentralizado("[        ]", 0, VERMELHO_B);
-            imprimirCentralizado("  [      ]", 0, VERMELHO_B);
-            imprimirCentralizado("  [      ]", 0, VERMELHO_B);
-            imprimirCentralizado("  [      ]", 0, VERMELHO_B);
-            imprimirCentralizado("  [      ]", 0, VERMELHO_B);
-        }
-        else
-        {
-            imprimirCentralizado("          ", 0);
-            imprimirCentralizado("          ", 0);
-            imprimirCentralizado("          ", 0);
-            imprimirCentralizado("          ", 0);
-            imprimirCentralizado("          ", 0);
-            imprimirCentralizado("          ", 0);
-            imprimirCentralizado("          ", 0);
-        }
-
-        cout << "\033[A" << "\033[A" << "\033[A" << "\033[A" << "\033[A" << "\033[A" << "\033[A"; // sobe 7 linhas para sobrescrever na proxima iteracao
+        imprimir(visivel);
+        for (int i = 0; i < nLinhas; i++) cout << "\033[A";
         visivel = !visivel;
         this_thread::sleep_for(chrono::milliseconds(500));
     }
-    cout << "\033[2K\n"; // limpa a linha do prompt ao sair
+}
+
+/**
+ * @brief Bloqueia ate Enter (inicia) ou Backspace (encerra o programa).
+ *
+ * Exibe o prompt de enter centralizado. Enter inicia o jogo, Backspace encerra.
+ */
+void aguardarTecla()
+{
+    cout << "\n";
+    vector<string> promptEnter = {
+        "[        ]",
+        "[  jogar ]",
+        "[        ]",
+        "  [      ]",
+        "  [      ]",
+        "  [      ]",
+        "  [      ]",
+    };
+    vector<string> promptBackspace = {
+        "[             ]",
+        "[        sair ]",
+        "[             ]",
+    };
+    bool iniciou = aguardarDuasTeclas(promptBackspace, promptEnter, VERMELHO_B, VERMELHO_B, 8, 13);
+    if (!iniciou)
+        exit(0); // Backspace encerra o programa
+}
+
+/**
+ * @brief Aguarda Enter (novo chute) ou Backspace (mentira).
+ *
+ * Exibe backspace a esquerda e enter a direita, ambos vermelhos.
+ *
+ * @return true se pressionou Backspace (mentira), false se pressionou Enter (novo chute).
+ */
+bool lerOpcao()
+{
+    cout << "\n";
+    vector<string> promptBackspace = {
+        "[             ]",
+        "[     mentira ]",
+        "[             ]",
+    };
+    vector<string> promptEnter = {
+        "[        ]",
+        "[  chute ]",
+        "[        ]",
+        "  [      ]",
+        "  [      ]",
+        "  [      ]",
+        "  [      ]",
+    };
+    // false = backspace (esq) = mentira, true = enter (dir) = novo chute
+    bool novoChute = aguardarDuasTeclas(promptBackspace, promptEnter, VERMELHO_B, VERMELHO_B, 8, 13);
+    return !novoChute; // inverte: retorna true se mentira (backspace)
 }
 
 // ========================
@@ -234,24 +353,50 @@ void aguardarTecla()
  */
 void aguardarTroca(const string &nomeExibido, int tempoEspera)
 {
-    this_thread::sleep_for(chrono::milliseconds(500));
+    system("cls");
     imprimirTitulo();
+    imprimirSeparador();
+    // "TROCA DE JOGADOR" entre dois separadores: sem linha vazia antes
     imprimirCentralizado("TROCA DE JOGADOR");
     imprimirSeparador();
+    // texto sem separador abaixo: linha vazia antes
     cout << "\n";
     imprimirCentralizado("Proximo jogador: " + nomeExibido);
     imprimirCentralizado("Jogador anterior, saia do computador.");
     imprimirCentralizado(nomeExibido + ", prepare-se para jogar.");
     cout << "\n";
+    imprimirSeparador();
 
     for (int t = tempoEspera; t > 0; t--)
     {
         this_thread::sleep_for(chrono::seconds(1));
         string msg = "Aguardando " + to_string(t) + " segundo(s)...";
-        imprimirCentralizado(msg, 0);
-        cout << "\n";
+        imprimirCentralizado(msg);
+        cout << "\033[A"; // sobrescreve a linha do contador a cada segundo
     }
-    imprimirSeparador();
+    cout << "\n";
+    system("cls");
+}
+
+/**
+ * @brief Exibe a tela de eliminacao de um jogador com a arte de derrota.
+ *
+ * Limpa a tela, imprime a arte Braille de derrota com efeito progressivo,
+ * exibe o nome do jogador eliminado entre separadores e pausa para leitura.
+ * Limpa a tela ao final para a proxima fase do jogo.
+ *
+ * @param nomeExibido Nome formatado (com cor ANSI) do jogador eliminado.
+ */
+void exibirTelaDerrota(const string &nomeExibido)
+{
+    system("cls");
+    imprimirDerrota(1); // arte Braille com efeito de aparecimento progressivo
+    cout << "\n";
+    imprimirSeparador("*");
+    // nome do eliminado entre dois separadores: sem linha vazia antes
+    imprimirCentralizado(nomeExibido + " foi ELIMINADO!", VERMELHO_B);
+    imprimirSeparador("*");
+    this_thread::sleep_for(chrono::milliseconds(3000)); // pausa para leitura da tela
     system("cls");
 }
 
@@ -314,8 +459,10 @@ bool lerConfiguracoes(const string &arquivo, int &numJogadores, int &numDados, i
 void lerNomesJogadores(vector<Jogador> &jogadores)
 {
     imprimirSeparador("-");
+    // "CADASTRO DE JOGADORES" entre dois separadores: sem linha vazia antes
     imprimirCentralizado("CADASTRO DE JOGADORES");
     imprimirSeparador("-");
+    // texto sem separador abaixo: linha vazia antes
     cout << "\n";
     for (auto &j : jogadores)
     {
@@ -376,39 +523,55 @@ int contarJogadoresAtivos(const vector<Jogador> &jogadores)
 
 /**
  * @brief Exibe o placar de dados restantes de cada jogador ativo.
+ *
+ * Imprime o bloco inteiro de uma vez e pausa 1,5 segundos para leitura.
+ *
  * @param jogadores Vetor de jogadores.
  */
 void exibirDadosRestantes(const vector<Jogador> &jogadores)
 {
-    cout << "\n";
     imprimirSeparador("-");
+    // "DADOS RESTANTES" entre dois separadores: sem linha vazia antes
     imprimirCentralizado("DADOS RESTANTES");
     imprimirSeparador("-");
+
+    // lista de jogadores sem separador abaixo: linha vazia antes
     cout << "\n";
+    vector<string> linhas;
     for (const auto &j : jogadores)
-    {
         if (j.ativo)
         {
-            string linha = j.nomeExibido + ": " + to_string(j.dados.size()) + " dado(s)";
-            imprimirCentralizado(linha);
+            string conteudo = j.nomeExibido + ": " + to_string(j.dados.size()) + " dado(s)";
+            int espacos = (LARGURA - tamanhoVisivel(conteudo)) / 2;
+            if (espacos < 0) espacos = 0;
+            linhas.push_back(string(espacos, ' ') + conteudo);
         }
-    }
+
+    imprimirBloco(linhas, 1500); // imprime tudo de uma vez, pausa 1,5s
     cout << "\n";
 }
 
 /**
- * @brief Exibe os dados do jogador atual em arte ASCII.
+ * @brief Exibe os dados do jogador atual em arte ASCII e o separador inferior.
+ *
+ * Imprime nome, dados e separador "⚀ ⚁..." instantaneamente,
+ * pausando 2 segundos apos os dados para leitura.
+ *
  * @param j Jogador cujos dados serao exibidos.
  */
 void exibirDadosJogador(const Jogador &j)
 {
+    // "Jogador atual" sem separador abaixo: linha vazia antes
     cout << "\n";
-    imprimirCentralizado("Jogador atual: " + j.nomeExibido, 100, VERMELHO_B);
+    imprimirCentralizado("Jogador atual: " + j.nomeExibido, VERMELHO_B);
+    // "Seus dados" sem separador abaixo: linha vazia antes
     cout << "\n";
     imprimirCentralizado("Seus dados:");
     cout << "\n";
     imprimirDados(j.dados); // renderiza os dados em 3D lado a lado
     cout << "\n";
+    this_thread::sleep_for(chrono::milliseconds(2000)); // pausa para o jogador ver seus dados
+    imprimirSeparador("⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ", LARGURA / 12); // separador inferior pertence ao bloco de dados
 }
 
 /**
@@ -422,6 +585,7 @@ void exibirDadosJogador(const Jogador &j)
 void revelarDados(const vector<Jogador> &jogadores)
 {
     imprimirSeparador("-");
+    // "DADOS REVELADOS" entre dois separadores: sem linha vazia antes
     imprimirCentralizado("DADOS REVELADOS");
     imprimirSeparador("-");
     for (const auto &j : jogadores)
@@ -429,7 +593,10 @@ void revelarDados(const vector<Jogador> &jogadores)
         if (j.ativo)
         {
             this_thread::sleep_for(chrono::seconds(2)); // suspense antes de revelar cada jogador
+            // nome sem separador abaixo: linha vazia antes
+            cout << "\n";
             imprimirCentralizado(j.nomeExibido + ":");
+            cout << "\n";
             imprimirDados(j.dados);
             cout << "\n";
         }
@@ -477,32 +644,6 @@ int lerChute(int minVal, int maxVal)
 }
 
 /**
- * @brief Pergunta ao jogador se deseja dizer mentira ou fazer novo chute.
- *
- * Repete a leitura ate que o usuario escolha 1 ou 2.
- *
- * @return true se o jogador escolheu "dizer mentira", false para "novo chute".
- */
-bool lerOpcao()
-{
-    int opcao;
-    while (true)
-    {
-        imprimirCentralizado("Escolha uma opcao:");
-        imprimirCentralizado("1 - Dizer mentira");
-        imprimirCentralizado("2 - Fazer novo chute");
-        string prompt = "Opcao: ";
-        int espacos = (LARGURA - (int)prompt.size()) / 2;
-        cout << string(espacos, ' ') << prompt;
-        if (cin >> opcao && (opcao == 1 || opcao == 2))
-            return opcao == 1;
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // descarta entrada invalida
-        imprimirCentralizado("Opcao invalida!");
-    }
-}
-
-/**
  * @brief Retorna o indice do proximo jogador ativo apos @p indiceAtual.
  *
  * Percorre o vetor circularmente ate encontrar um jogador com ativo == true.
@@ -532,7 +673,7 @@ int proximoAtivo(const vector<Jogador> &jogadores, int indiceAtual)
  *  2. Os jogadores se revezam fazendo chutes crescentes sobre a soma total.
  *  3. Um jogador pode chamar "mentira" no chute anterior.
  *  4. Os dados sao revelados; o perdedor perde um dado.
- *  5. Se o perdedor ficar sem dados, e eliminado.
+ *  5. Se o perdedor ficar sem dados, e eliminado e a tela de derrota e exibida.
  *
  * Apos a rodada, @p indiceInicio e atualizado para o jogador que sucede
  * o perdedor, que comeca a proxima rodada.
@@ -545,47 +686,55 @@ int proximoAtivo(const vector<Jogador> &jogadores, int indiceAtual)
 void executarRodada(vector<Jogador> &jogadores, int &indiceInicio, int tempoTroca, int rodada)
 {
     int dadosAtivos = contarDadosAtivos(jogadores);
-    int somaMaxima  = dadosAtivos * 6; // maior chute possivel (todos os dados em 6)
+    int somaMaxima = dadosAtivos * 6; // maior chute possivel (todos os dados em 6)
 
     rolarDados(jogadores);
 
-    int  ultimoChute          = -1;
-    int  indiceUltimoChutador = -1;
-    int  indiceAtual          = indiceInicio;
-    bool primeiroChute        = true;  // true enquanto nenhum chute foi feito na rodada
-    bool mentiraDita          = false;
+    int ultimoChute = -1;
+    int indiceUltimoChutador = -1;
+    int indiceAtual = indiceInicio;
+    bool primeiroChute = true; // true enquanto nenhum chute foi feito na rodada
+    bool mentiraDita = false;
 
     while (true)
     {
         aguardarTroca(jogadores[indiceAtual].nomeExibido, tempoTroca);
 
-        this_thread::sleep_for(chrono::milliseconds(500));
+        // cabecalho da rodada
         imprimirTitulo();
-        imprimirCentralizado("RODADA " + to_string(rodada), 100, VERMELHO_B);
-        cout << VERMELHO_B;
         imprimirSeparador();
-        cout << RESET;
+        // "RODADA N" entre dois separadores: sem linha vazia antes
+        imprimirCentralizado("RODADA " + to_string(rodada), VERMELHO_B);
+        imprimirSeparador();
+
         exibirDadosRestantes(jogadores);
-        imprimirSeparador("⚀");
-        exibirDadosJogador(jogadores[indiceAtual]);
-        imprimirSeparador("⚀");
+        imprimirSeparador("⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ", LARGURA / 12);
+        exibirDadosJogador(jogadores[indiceAtual]); // ja imprime o separador inferior internamente
+        // texto sem separador abaixo: linha vazia antes
+        cout << "\n";
 
         if (primeiroChute)
         {
             // Primeiro jogador da rodada: obrigado a fazer um chute inicial
             imprimirCentralizado("Ainda nao existe chute nesta rodada.");
             int chute = lerChute(1, somaMaxima);
-            ultimoChute          = chute;
+            ultimoChute = chute;
             indiceUltimoChutador = indiceAtual;
+            // confirmacao sem separador abaixo: linha vazia antes
+            cout << "\n";
             imprimirCentralizado(jogadores[indiceAtual].nomeExibido + " chutou: " + to_string(chute));
+            this_thread::sleep_for(chrono::milliseconds(1500)); // pausa pos-chute
             primeiroChute = false;
         }
         else
         {
             // Demais jogadores: podem aumentar o chute ou chamar mentira
+            // estado sem separador abaixo: linha vazia antes
+            cout << "\n";
             imprimirCentralizado("Ultimo chute: " + to_string(ultimoChute) +
                                  " (feito por " + jogadores[indiceUltimoChutador].nomeExibido + ")");
             imprimirCentralizado("Soma maxima possivel: " + to_string(somaMaxima));
+            this_thread::sleep_for(chrono::milliseconds(1500)); // pausa para leitura do estado
             cout << "\n";
 
             if (ultimoChute >= somaMaxima)
@@ -606,8 +755,10 @@ void executarRodada(vector<Jogador> &jogadores, int &indiceInicio, int tempoTroc
                     // Novo chute deve ser estritamente maior que o anterior
                     int chute = lerChute(ultimoChute + 1, somaMaxima);
                     indiceUltimoChutador = indiceAtual;
-                    ultimoChute          = chute;
+                    ultimoChute = chute;
+                    cout << "\n";
                     imprimirCentralizado(jogadores[indiceAtual].nomeExibido + " chutou: " + to_string(chute));
+                    this_thread::sleep_for(chrono::milliseconds(1500)); // pausa pos-chute
                 }
             }
         }
@@ -617,6 +768,7 @@ void executarRodada(vector<Jogador> &jogadores, int &indiceInicio, int tempoTroc
             // Resolucao: revelar dados e determinar o perdedor
             this_thread::sleep_for(chrono::seconds(2));
             imprimirSeparador();
+            // "disse: MENTIRA" entre dois separadores: sem linha vazia antes
             imprimirCentralizado(jogadores[indiceAtual].nomeExibido + " disse: MENTIRA!");
             imprimirSeparador();
 
@@ -625,17 +777,21 @@ void executarRodada(vector<Jogador> &jogadores, int &indiceInicio, int tempoTroc
             int somaReal = calcularSomaReal(jogadores);
 
             this_thread::sleep_for(chrono::seconds(2));
+            // chute sem separador abaixo: linha vazia antes
+            cout << "\n";
             imprimirCentralizado("Ultimo chute: " + to_string(ultimoChute));
 
             this_thread::sleep_for(chrono::seconds(2));
-            imprimirCentralizadoDevagar("Soma real:    " + to_string(somaReal));
-            cout << "\n";
+            imprimirCentralizadoDevagar("Soma real:    " + to_string(somaReal), 150); // letra por letra para suspense
+
+            this_thread::sleep_for(chrono::milliseconds(1500));
 
             int perdedor;
             if (somaReal >= ultimoChute)
             {
                 // Chute era valido: quem chamou mentira perde
                 perdedor = indiceAtual;
+                cout << "\n";
                 imprimirCentralizado("A soma real era maior ou igual ao chute.");
                 imprimirCentralizado(jogadores[perdedor].nomeExibido + " perde um dado!");
             }
@@ -643,22 +799,26 @@ void executarRodada(vector<Jogador> &jogadores, int &indiceInicio, int tempoTroc
             {
                 // Chute era invalido: quem chutou perde
                 perdedor = indiceUltimoChutador;
+                cout << "\n";
                 imprimirCentralizado("A soma real era menor que o chute.");
                 imprimirCentralizado(jogadores[perdedor].nomeExibido + " perde um dado!");
             }
 
+            this_thread::sleep_for(chrono::milliseconds(2000));
+
             jogadores[perdedor].dados.pop_back(); // remove um dado do perdedor
+            cout << "\n";
             imprimirCentralizado(jogadores[perdedor].nomeExibido + " perdeu um dado.");
 
             if (jogadores[perdedor].dados.empty())
             {
-                // Sem dados: jogador e eliminado
+                // Sem dados: jogador e eliminado — exibe tela de derrota com a arte Braille
                 jogadores[perdedor].ativo = false;
-                imprimirSeparador("*");
-                imprimirCentralizado(jogadores[perdedor].nomeExibido + " ficou sem dados e foi ELIMINADO!");
-                imprimirSeparador("*");
+                this_thread::sleep_for(chrono::milliseconds(1000));
+                exibirTelaDerrota(jogadores[perdedor].nomeExibido);
             }
 
+            this_thread::sleep_for(chrono::milliseconds(2000));
             indiceInicio = proximoAtivo(jogadores, perdedor); // perdedor (ou proximo) abre a proxima rodada
             break;
         }
@@ -686,7 +846,7 @@ int main()
 
     // Habilita sequencias VT100/ANSI no console do Windows
     HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    DWORD  dwMode = 0;
+    DWORD dwMode = 0;
     GetConsoleMode(hOut, &dwMode);
     SetConsoleMode(hOut, dwMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING);
 
@@ -695,24 +855,24 @@ int main()
     int numJogadores, numDados, tempoTroca;
 
     if (!lerConfiguracoes("config.txt", numJogadores, numDados, tempoTroca))
-    {
         return 1;
-    }
 
     // Inicializa vetor de jogadores com dados zerados e status ativo
     vector<Jogador> jogadores(numJogadores);
     for (int i = 0; i < numJogadores; i++)
     {
-        jogadores[i].id          = i + 1;
-        jogadores[i].nome        = "";
+        jogadores[i].id = i + 1;
+        jogadores[i].nome = "";
         jogadores[i].nomeExibido = "";
         jogadores[i].dados.resize(numDados, 0);
-        jogadores[i].ativo       = true;
+        jogadores[i].ativo = true;
     }
 
-    // Tela de boas-vindas com resumo da configuracao
+    // Tela de boas-vindas: layout letra por letra, resto instantaneo
     imprimirTitulo(1);
-    imprimirCentralizado(
+    // configs sem separador abaixo: linha vazia antes
+    cout << "\n";
+    imprimirCentralizadoDevagar(
         "Jogadores: " + to_string(numJogadores) +
             "                                      Dados por jogador: " + to_string(numDados) +
             "                      Tempo de troca: " + to_string(tempoTroca) + " segundo(s)",
@@ -720,22 +880,24 @@ int main()
     cout << "\n" << VERMELHO_B;
     imprimirSeparador();
     cout << RESET;
-    aguardarTecla();
-    system("cls");
+    aguardarTecla(); // Enter = iniciar, Backspace = sair
 
     lerNomesJogadores(jogadores);
 
-    // Confirmacao dos jogadores cadastrados
+    // Bloco de confirmacao dos jogadores cadastrados
     imprimirSeparador();
+    // "JOGADORES CADASTRADOS" entre dois separadores: sem linha vazia antes
     imprimirCentralizado("JOGADORES CADASTRADOS");
     imprimirSeparador();
+    // nomes sem separador abaixo: linha vazia antes
     cout << "\n";
     for (const auto &j : jogadores)
         imprimirCentralizado(j.nomeExibido);
+    this_thread::sleep_for(chrono::milliseconds(2000));
     system("cls");
 
     int indiceInicio = 0; // jogador que abre a primeira rodada
-    int rodada       = 1;
+    int rodada = 1;
 
     // Loop principal: continua ate restar apenas um jogador ativo
     while (contarJogadoresAtivos(jogadores) > 1)
@@ -747,6 +909,7 @@ int main()
     // Tela de fim de jogo com o vencedor
     imprimirTitulo();
     imprimirSeparador("*");
+    // "FIM DE JOGO" entre dois separadores: sem linha vazia antes
     imprimirCentralizado("FIM DE JOGO!");
     for (const auto &j : jogadores)
     {

@@ -149,7 +149,7 @@ void imprimirDados(const vector<int> &dados)
         if (d > 0 && d < 7)
             cout << "\033[91m       [" << d << "]         \033[0m"; // valor valido em vermelho
         else
-            cout << "\033[91m       [?]         \033[0m";            // valor invalido
+            cout << "\033[91m       [?]         \033[0m"; // valor invalido
     }
     cout << "\n";
 }
