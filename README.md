@@ -1,3 +1,9 @@
+apagar dps:
+
+"[                                                    ]"
+"[                      história                      ]"
+"[                                                    ]"
+
 # DadosMentirosos
 
 Jogo de dados estilo **Perudo** para múltiplos jogadores no terminal Windows,
