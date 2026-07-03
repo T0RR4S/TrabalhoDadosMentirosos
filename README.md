@@ -14,7 +14,10 @@ com arte ASCII/Braille, efeitos de digitação e suporte a cores ANSI.
 ## Compilação e execução
 
 ```
-clear; chcp 65001; g++ -std=c++17 main.cpp dados.cpp layout.cpp layout2.cpp -o jogo.exe; ./jogo.exe
+clear
+chcp 65001
+g++ -std=c++17 main.cpp dados.cpp layout.cpp layout2.cpp -o jogo.exe
+./jogo.exe
 ```
 
 - `chcp 65001` define a página de código UTF-8 no terminal Windows, necessária
