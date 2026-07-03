@@ -28,6 +28,8 @@
 #include <chrono>
 #include <thread>
 #include <limits>
+#include <fcntl.h>
+#include <io.h>
 
 using namespace std;
 
@@ -732,7 +734,7 @@ void executarRodada(vector<Jogador> &jogadores, int &indiceInicio, int tempoTroc
             // estado sem separador abaixo: linha vazia antes
             cout << "\n";
             imprimirCentralizado("Ultimo chute: " + to_string(ultimoChute) +
-                                 " (feito por " + jogadores[indiceUltimoChutador].nomeExibido + ")");
+                                " (feito por " + jogadores[indiceUltimoChutador].nomeExibido + ")");
             imprimirCentralizado("Soma maxima possivel: " + to_string(somaMaxima));
             this_thread::sleep_for(chrono::milliseconds(1500)); // pausa para leitura do estado
             cout << "\n";
@@ -842,6 +844,9 @@ void executarRodada(vector<Jogador> &jogadores, int &indiceInicio, int tempoTroc
  */
 int main()
 {
+
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
     system("cls");
 
     // Habilita sequencias VT100/ANSI no console do Windows
