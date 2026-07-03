@@ -19,6 +19,7 @@
 #include <fstream>
 #include "layout.h"
 #include "layout2.h"
+#include "layout3.h"
 #include "dados.h"
 #include "cores.h"
 #include <vector>
@@ -30,6 +31,7 @@
 #include <limits>
 #include <fcntl.h>
 #include <io.h>
+
 
 using namespace std;
 
@@ -401,6 +403,21 @@ void exibirTelaDerrota(const string &nomeExibido)
     this_thread::sleep_for(chrono::milliseconds(3000)); // pausa para leitura da tela
     system("cls");
 }
+
+void exibirTelaVitoria(const string &nomeExibido)
+{
+    system("cls");
+    imprimirVitoria(1); // arte Braille com efeito de aparecimento progressivo
+    cout << "\n";
+    imprimirSeparador("⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ", LARGURA / 12);
+    // nome do eliminado entre dois separadores: sem linha vazia antes
+    imprimirCentralizado(nomeExibido + ", VOCÊ SALVOU SUA ALMA! O CASSINO É SEU!", VERMELHO_B);
+    imprimirSeparador("⚀ ⚁ ⚂ ⚃ ⚄ ⚅ ", LARGURA / 12);
+    this_thread::sleep_for(chrono::milliseconds(3000)); // pausa para leitura da tela
+    system("cls");
+}
+
+
 
 /**
  * @brief Le as configuracoes da partida a partir de um arquivo texto.
@@ -920,7 +937,7 @@ int main()
     {
         if (j.ativo)
         {
-            imprimirCentralizado(j.nomeExibido + ", VOCÊ SOBREVIVEU!");
+            exibirTelaVitoria(j.nomeExibido);
             break;
         }
     }

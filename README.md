@@ -16,7 +16,7 @@ com arte ASCII/Braille, efeitos de digitação e suporte a cores ANSI.
 ```
 clear
 chcp 65001
-g++ -std=c++17 main.cpp dados.cpp layout.cpp layout2.cpp -o jogo.exe
+g++ -std=c++17 main.cpp dados.cpp layout.cpp layout2.cpp layout3.cpp -o jogo.exe
 ./jogo.exe
 ```
 
