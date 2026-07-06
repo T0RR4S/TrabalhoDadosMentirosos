@@ -21,7 +21,9 @@
 #include "layout2.h"
 #include "dados.h"
 #include "cores.h"
+#include "historia.h"
 #include <vector>
+#include <algorithm>
 #include <string>
 #include <cstdlib>
 #include <ctime>
@@ -285,30 +287,122 @@ bool aguardarDuasTeclas(
 }
 
 /**
- * @brief Bloqueia ate Enter (inicia) ou Backspace (encerra o programa).
+ * @brief Exibe tres prompts piscantes lado a lado e aguarda uma das tres teclas.
  *
- * Exibe o prompt de enter centralizado. Enter inicia o jogo, Backspace encerra.
+ * Mesma logica de aguardarDuasTeclas(), mas com um terceiro prompt central.
+ * Usada na tela inicial para oferecer sair / ver historia / jogar.
+ *
+ * @param promptEsq  Linhas do prompt da esquerda.
+ * @param promptMeio Linhas do prompt do meio.
+ * @param promptDir  Linhas do prompt da direita.
+ * @param teclaEsq   Codigo ASCII da tecla esquerda.
+ * @param teclaMeio  Codigo ASCII da tecla do meio.
+ * @param teclaDir   Codigo ASCII da tecla direita.
+ * @return Codigo ASCII da tecla pressionada (uma das tres informadas).
+ */
+
+ 
+int aguardarTresTeclas(
+    const vector<string> &promptEsq, const vector<string> &promptMeio, const vector<string> &promptDir,
+    int teclaEsq, int teclaMeio, int teclaDir)
+{
+    int nE = (int)promptEsq.size();
+    int nM = (int)promptMeio.size();
+    int nD = (int)promptDir.size();
+    int nLinhas = max({nE, nM, nD});
+
+    int largE = 0, largM = 0, largD = 0;
+    for (const auto &l : promptEsq)  largE = max(largE, (int)l.size());
+    for (const auto &l : promptMeio) largM = max(largM, (int)l.size());
+    for (const auto &l : promptDir)  largD = max(largD, (int)l.size());
+
+    int gap = 16; // espacos entre cada prompt
+    int largTotal = largE + gap + largM + gap + largD;
+    int padEsq = (LARGURA - largTotal) / 2;
+    if (padEsq < 0) padEsq = 0;
+
+    auto imprimir = [&](bool visivel)
+    {
+        for (int i = 0; i < nLinhas; i++)
+        {
+            string lE = (i < nE) ? promptEsq[i]  : string(largE, ' ');
+            string lM = (i < nM) ? promptMeio[i] : string(largM, ' ');
+            string lD = (i < nD) ? promptDir[i]  : string(largD, ' ');
+
+            lE += string(largE - (int)lE.size(), ' ');
+            lM += string(largM - (int)lM.size(), ' ');
+            lD += string(largD - (int)lD.size(), ' ');
+
+            cout << string(padEsq, ' ');
+            if (visivel) cout << VERMELHO_B;
+            cout << lE << RESET << string(gap, ' ');
+            if (visivel) cout << VERMELHO_B;
+            cout << lM << RESET << string(gap, ' ');
+            if (visivel) cout << VERMELHO_B;
+            cout << lD << RESET << "\n";
+        }
+    };
+
+    imprimir(true);
+    for (int i = 0; i < nLinhas; i++) cout << "\033[A";
+
+    bool visivel = true;
+    while (true)
+    {
+        if (_kbhit())
+        {
+            int tecla = _getch();
+            if (tecla == teclaEsq || tecla == teclaMeio || tecla == teclaDir)
+            {
+                for (int i = 0; i < nLinhas; i++) cout << "\033[2K\n";
+                system("cls");
+                return tecla;
+            }
+            if (tecla == 0 || tecla == 224) _getch(); // descarta segundo byte de tecla especial
+        }
+
+        imprimir(visivel);
+        for (int i = 0; i < nLinhas; i++) cout << "\033[A";
+        visivel = !visivel;
+        this_thread::sleep_for(chrono::milliseconds(500));
+    }
+}
+
+/**
+ * @brief Bloqueia ate Backspace (sair), Espaco (ver historia) ou Enter (jogar).
+ *
+ * Espaco abre a tela de historia (exibirHistoria()); se o jogador aceitar
+ * no ultimo slide, o jogo segue para o cadastro; se sair de qualquer forma
+ * durante a historia, o programa encerra. Enter pula direto para o
+ * cadastro, sem ver a historia. Backspace encerra o programa direto.
  */
 void aguardarTecla()
 {
     cout << "\n";
-    vector<string> promptEnter = {
-        "[        ]",
-        "[  jogar ]",
-        "[        ]",
-        "  [      ]",
-        "  [      ]",
-        "  [      ]",
-        "  [      ]",
-    };
     vector<string> promptBackspace = {
-        "[             ]",
-        "[        sair ]",
-        "[             ]",
+        "[Backspace] Sair",
     };
-    bool iniciou = aguardarDuasTeclas(promptBackspace, promptEnter, VERMELHO_B, VERMELHO_B, 8, 13);
-    if (!iniciou)
+    vector<string> promptEspaco = {
+        "[Espaço] Ver Historia",
+    };
+    vector<string> promptEnter = {
+        "[Enter] Jogar",
+    };
+
+    int tecla = aguardarTresTeclas(promptBackspace, promptEspaco, promptEnter, 8, ' ', 13);
+
+    if (tecla == 8)
         exit(0); // Backspace encerra o programa
+
+    if (tecla == ' ')
+    {
+        bool aceitou = exibirHistoria();
+        if (!aceitou)
+            exit(0); // saiu durante a historia (Espaco ou Backspace no ultimo slide)
+        return;      // aceitou -> segue para o cadastro de jogadores
+    }
+
+    // tecla == 13 (Enter): segue direto para o cadastro, sem ver a historia
 }
 
 /**
@@ -322,18 +416,10 @@ bool lerOpcao()
 {
     cout << "\n";
     vector<string> promptBackspace = {
-        "[             ]",
-        "[     mentira ]",
-        "[             ]",
+        "[Backspace] Mentira",
     };
     vector<string> promptEnter = {
-        "[        ]",
-        "[  chute ]",
-        "[        ]",
-        "  [      ]",
-        "  [      ]",
-        "  [      ]",
-        "  [      ]",
+        "[Enter] Chute",
     };
     // false = backspace (esq) = mentira, true = enter (dir) = novo chute
     bool novoChute = aguardarDuasTeclas(promptBackspace, promptEnter, VERMELHO_B, VERMELHO_B, 8, 13);
@@ -568,7 +654,7 @@ void exibirDadosJogador(const Jogador &j)
     imprimirCentralizado("Jogador atual: " + j.nomeExibido, VERMELHO_B);
     // "Seus dados" sem separador abaixo: linha vazia antes
     cout << "\n";
-    imprimirCentralizado("Seus dados:");
+    imprimirCentralizado("Seu(s) dado(s):");
     cout << "\n";
     imprimirDados(j.dados); // renderiza os dados em 3D lado a lado
     cout << "\n";
