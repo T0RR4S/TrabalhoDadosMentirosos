@@ -258,7 +258,7 @@ static vector<Slide> montarSlides()
             u8"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣘⢦⡙⣆⠻⣔⡃⢸⡜⣭⠲⣤⢛⡴⢫⡜⡭⢆⡍⠻⡟⠀⣿⡀⠀⠀⠀⠀⠀⠀⠉⠙⠻⠿⢿⣿⣿⣿⠿⠛⠀⠀⠌⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠂⠀⠴⠀⠂",
             u8"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠃⢧⡚⡜⢦⠳⣌⠧⠐⡺⡴⣋⠶⣍⡞⡱⢎⡵⣋⠼⡱⠀⢈⠻⠷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠀⠂⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⠀⠀⠀",
         },
-        "Cada um rola seus dados em segredo e aposta sobre a soma total da mesa. Aumente a aposta ou grite MENTIRA! Quem errar, perde um dado. O ultimo com dados vence... e escapa com a alma intacta."});
+        "Cada um rola seus dados em segredo e aposta sobre a soma total da mesa. Aumente a aposta ou grite MENTIRA! Quem errar,\nperde um dado. O ultimo com dados vence... e escapa com a alma intacta."});
 
     return slides;
 }
