@@ -376,33 +376,57 @@ int aguardarTresTeclas(
  * durante a historia, o programa encerra. Enter pula direto para o
  * cadastro, sem ver a historia. Backspace encerra o programa direto.
  */
-void aguardarTecla()
+void aguardarTecla(int numJogadores, int numDados, int tempoTroca)
 {
-    cout << "\n";
-    vector<string> promptBackspace = {
-        "[Backspace] Sair",
-    };
-    vector<string> promptEspaco = {
-        "[Espaço] Ver Historia",
-    };
-    vector<string> promptEnter = {
-        "[Enter] Jogar",
-    };
-
-    int tecla = aguardarTresTeclas(promptBackspace, promptEspaco, promptEnter, 8, ' ', 13);
-
-    if (tecla == 8)
-        exit(0); // Backspace encerra o programa
-
-    if (tecla == ' ')
+    bool primeiraExibicao = true;
+    while (true)
     {
-        bool aceitou = exibirHistoria();
-        if (!aceitou)
-            exit(0); // saiu durante a historia (Espaco ou Backspace no ultimo slide)
-        return;      // aceitou -> segue para o cadastro de jogadores
+        
+
+        if (!primeiraExibicao)
+        {
+            // Redesenha a tela inicial (a primeira vez ja foi desenhada pelo main()
+            // com efeito de digitacao; aqui e instantaneo, pois e um redraw).
+            system("cls");
+            imprimirTitulo();
+            cout << "\n";
+            imprimirCentralizado(
+                "Jogadores: " + to_string(numJogadores) +
+                    "                                      Dados por jogador: " + to_string(numDados) +
+                    "                      Tempo de troca: " + to_string(tempoTroca) + " segundo(s)",
+                VERMELHO_B);
+            cout << "\n" << VERMELHO_B;
+            imprimirSeparador();
+            cout << RESET;
+        }
+        primeiraExibicao = false;
+        cout << "\n";
+        vector<string> promptBackspace = {
+            "[Backspace] Sair",
+        };
+        vector<string> promptEspaco = {
+            "[Espaço] Ver Historia",
+        };
+        vector<string> promptEnter = {
+            "[Enter] Jogar",
+        };
+
+        int tecla = aguardarTresTeclas(promptBackspace, promptEspaco, promptEnter, 8, ' ', 13);
+
+        if (tecla == 8)
+            exit(0); // Backspace na tela inicial encerra o programa (esse continua certo)
+
+        if (tecla == ' ')
+        {
+            bool aceitou = exibirHistoria();
+            if (aceitou)
+                return; // aceitou -> segue para o cadastro de jogadores
+            continue;   // saiu da historia -> volta para a tela inicial (nao encerra)
+        }
+
+        return; // tecla == 13 (Enter): segue direto para o cadastro
     }
 
-    // tecla == 13 (Enter): segue direto para o cadastro, sem ver a historia
 }
 
 /**
@@ -971,7 +995,7 @@ int main()
     cout << "\n" << VERMELHO_B;
     imprimirSeparador();
     cout << RESET;
-    aguardarTecla(); // Enter = iniciar, Backspace = sair
+    aguardarTecla(numJogadores, numDados, tempoTroca); // Enter = iniciar, Backspace = sair
 
     lerNomesJogadores(jogadores);
 

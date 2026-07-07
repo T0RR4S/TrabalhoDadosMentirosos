@@ -101,8 +101,7 @@ static vector<Slide> montarSlides()
             u8"⣹⠇⠠⢀⠩⣙⡋⠶⢄⢁⠀⣧⣈⠐⣈⠧⠀⠲⢁⣼⢍⡖⡯⣎⠷⣬⠇⢛⣩⣙⠆⢘⡩⡙⠦⣗⣢⢽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⣛⣩⣶⣾⣿⣿⡟⡿⠛⢍⠿⣿⣄⡈⢁⣂⢿⡞⠁⣤⣀⣁⡘⢦⠙⢿⣒⢻⣵⣳⢮⣽⣻⠎⣱⠖⡖⡂⠵⡾⠟⠻⣦⢢⡽⣞⠸⡴⣾⣽⣶⠆",
             u8"⡶⠈⠴⠒⠲⣼⣂⠐⠾⠏⣀⠁⠜⠊⠀⠀⠠⢀⡈⢧⡭⠼⡵⡚⢴⣇⠞⣣⠓⡁⣈⠥⡐⣡⡶⠶⣯⢯⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⢟⣫⣵⣶⣿⣿⣿⣿⢿⠿⡏⠨⠁⣈⡀⡹⠅⠐⠦⠊⠚⠺⢿⠀⠚⢒⠈⣟⠳⡄⠘⣿⠎⢲⢋⢶⣠⠭⣌⡲⢃⠞⠇⢠⠁⡤⠂⠻⢷⢡⡛⢤⣶⣾⢿⣷⡟",
         },
-        "Texto narrativo do slide 1..."
-    });
+        "DADOS MENTIROSOS - Uma aposta que pode custar sua alma..."});
 
     // --- Slide 2 -----------------------------------------------------
     slides.push_back(Slide{
@@ -141,8 +140,7 @@ static vector<Slide> montarSlides()
             u8"⣛⣷⣟⣿⢿⣿⣟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣴⣶⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣟⣿⣷⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⣳⡦⠈⠻⠁⠀⠟⠏⠈⠀⠀⠀⠀⠀⠀⠀",
             u8"⣈⣳⣙⣚⣽⣺⣯⣿⣿⣿⣿⣿⣿⣷⣿⣷⣶⣷⣷⣿⣿⣿⣿⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⠋⣰⡟⠿⠄⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀",
         },
-        "Texto narrativo do slide 2..."
-    });
+        "Dois apostadores encontraram um cassino escondido... e não resistiram a entrar."});
 
     // --- Slide 3 -----------------------------------------------------
     slides.push_back(Slide{
@@ -182,8 +180,7 @@ static vector<Slide> montarSlides()
             u8"⣿⣿⣿⣿⠟⣵⣿⣿⣮⡻⣿⣿⣿⣿⣟⣿⣿⣱⣿⣞⣿⣿⢸⣇⣿⣼⡏⡇⢿⢇⣽⢿⣪⣺⡿⣪⡿⡿⣪⡺⣿⣤⣻⣷⣕⢿⢗⣝⡿⣪⡻⠟⠄⡘⣈⢡⣉⣉⣍⣩⣉⣍⣉⣉⢌⡉⢂⠃⡘⢸⣤⠿⣧⣜⠿⣯⡼⣿⣪⡻⣟⣤⣿⢟⣤⣿⣟⣔⢿⡿⣨⡾⢸⢱⣇⣿⣸⣇⣿⣿⢣⣿⣏⢿⣿⣿⣿⣿⣿⣿⠟⣵⣿⣿⣮⡻⣿⣿⣿⣿",
             u8"⣿⣿⠿⣫⣾⣿⣿⣿⣿⣿⣝⢿⣿⣿⡯⣿⢧⣿⣿⣿⡜⡏⣿⡿⠀⠟⠋⠁⠀⠉⠉⠀⠉⠁⠈⠉⠉⠈⠉⠁⠈⠉⠁⠀⠉⠀⠈⠉⠀⠁⠀⠀⢤⠰⣀⠦⢤⡰⢤⢦⡰⢤⡢⣔⢢⡔⠢⢄⡀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠉⠀⠈⠁⠀⠈⠉⠀⠈⠉⠁⠈⠁⠁⠈⠙⠛⠀⠿⣿⢹⢣⣿⣿⣿⡞⣿⣿⣿⣿⠿⣫⣾⣿⣿⣿⣿⣷⣝⠿⣿⣿",
         },
-        "Texto narrativo do slide 3..."
-    });
+        "Bem-vindos ao cassino do Devil, onde toda aposta tem um preço."});
 
     // --- Slide 4 -----------------------------------------------------
     slides.push_back(Slide{
@@ -222,8 +219,7 @@ static vector<Slide> montarSlides()
             u8"⢸⢎⡿⣺⢿⣼⣻⣽⣾⠻⠙⢋⣡⠴⢛⠱⢢⠓⠣⠑⠄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⢉⠇⡀⠀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣗⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢯⢽",
             u8"⢈⠏⡞⣱⢟⡾⣽⣳⣿⡷⠶⠦⠂⢀⠤⠹⠃⠈⠀⠄⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⠛⠠⢋⠀⠐⢠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣇⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣟⡿⣭⡛⡌",
         },
-        "Texto narrativo do slide 4..."
-    });
+        "'Um simples jogo de dados' - disse ele. 'Vencedores levam o cassino. Perdedores... me devem a alma.'"});
 
     // --- Slide 5 -----------------------------------------------------
     slides.push_back(Slide{
@@ -262,8 +258,7 @@ static vector<Slide> montarSlides()
             u8"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣘⢦⡙⣆⠻⣔⡃⢸⡜⣭⠲⣤⢛⡴⢫⡜⡭⢆⡍⠻⡟⠀⣿⡀⠀⠀⠀⠀⠀⠀⠉⠙⠻⠿⢿⣿⣿⣿⠿⠛⠀⠀⠌⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠂⠀⠴⠀⠂",
             u8"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠃⢧⡚⡜⢦⠳⣌⠧⠐⡺⡴⣋⠶⣍⡞⡱⢎⡵⣋⠼⡱⠀⢈⠻⠷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠀⠂⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⠀⠀⠀",
         },
-        "Texto narrativo do slide 5..."
-    });
+        "Cada um rola seus dados em segredo e aposta sobre a soma total da mesa. Aumente a aposta ou grite MENTIRA! Quem errar, perde um dado. O ultimo com dados vence... e escapa com a alma intacta."});
 
     return slides;
 }
@@ -304,9 +299,14 @@ bool exibirHistoria()
         imprimirSeparador("-");
 
         if (ultimo)
-            imprimirCentralizado("Voce(s) aceitam?", VERMELHO_B);
+        {
+            cout << "\n";
+            imprimirCentralizado("Voce(s) aceita(m)?", VERMELHO_B);
+            cout << "\n";
+            imprimirCentralizado("[Backspace] Sair     [Enter] Aceitar");
+        }
         else
-            imprimirCentralizado("[Backspace] voltar     [Enter] avancar     [Espaco] sair");
+            imprimirCentralizado("[Backspace] Voltar     [Enter] Avancar     [Espaco] Sair");
 
         int tecla = lerTeclaNavegacao();
 
@@ -315,15 +315,18 @@ bool exibirHistoria()
 
         if (tecla == 13) // Enter
         {
-            if (ultimo) return true; // aceitou -> inicia o jogo
+            if (ultimo)
+                return true; // aceitou -> inicia o jogo
             i++;
             continue;
         }
 
         if (tecla == 8) // Backspace
         {
-            if (ultimo) return false;  // no ultimo slide, Backspace sai (mesmo que Espaco)
-            if (i == 0) return false;  // no primeiro slide, Backspace tambem sai
+            if (ultimo)
+                return false; // no ultimo slide, Backspace sai (mesmo que Espaco)
+            if (i == 0)
+                return false; // no primeiro slide, Backspace tambem sai
             i--;
             continue;
         }
