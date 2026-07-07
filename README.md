@@ -77,6 +77,10 @@ DadosMentirosos/
 ├── layout.h      — Interface de layout.cpp
 ├── layout2.cpp   — Arte Braille/ASCII da tela de derrota
 ├── layout2.h     — Interface de layout2.cpp
+├── layout3.cpp   — Arte Braille/ASCII da tela de derrota
+├── layout3.h     — Interface de layout3.cpp
+├── historia.cpp  — Arte Braille/ASCII dos "slides" da história
+├── historia.h     — Interface de historia.cpp
 ├── cores.h       — Macros de escape ANSI para cores e estilos
 ├── config.txt    — Configuração da partida (jogadores, dados, tempo)
 └── README.md     — Este arquivo
